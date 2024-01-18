@@ -1,18 +1,37 @@
+#Copied from https://yuukidach.github.io/p/makefile-for-projects-with-subdirectories/
+TARGET = main
+
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c99
+CFLAGS = -g
 
-all: main
+OUTDIR = ./bin
+DATADIR = ./data
+SUBDIR = math
+DIR_OBJ = ./obj
 
-main: main.o matrix.o image.o
-	$(CC) $(CFLAGS) -o main main.o matrix.o image.o
+INCS = $(wildcard *.h $(foreach fd, $(SUBDIR), $(fd)/*.h))
+SRCS = $(wildcard *.c $(foreach fd, $(SUBDIR), $(fd)/*.c))
+NODIR_SRC = $(notdir $(SRCS))
+OBJS = $(addprefix $(DIR_OBJ)/, $(SRCS:c=o))
+INC_DIRS = -I./ $(addprefix -I, $(SUBDIR))
 
-main.o: main.c matrix.h
-	$(CC) $(CFLAGS) -c main.c
+PHONY := $(TARGET)
+$(TARGET): $(OBJS)
+	$(CC) -o $(OUTDIR)/$@ $(OBJS)
 
-matrix.o: matrix.c matrix.h
-	$(CC) $(CFLAGS) -c matrix.c
+$(DIR_OBJ)/%.o: %.c $(INCS)
+	mkdir -p $(@D)
+	$(CC) -o $@ $(CFLAGS) -c $< $(INC_DIRS)
 
-image.o: image.c image.h
-	$(CC) $(CFLAGS) -c image.c
+PHONY += clean
 clean:
-	rm -f main main.o matrix.o image.o
+	rm -rf $(OUTDIR)/* $(DATADIR)/* $(DIR_OBJ)/*
+
+PHONY += echoes
+echoes:
+	@echo "INC files: $(INCS)"
+	@echo "SRC files: $(SRCS)"
+	@echo "OBJ files: $(OBJS)"
+	@echo "INC DIR: $(INC_DIRS)"
+
+.PHONY = $(PHONY)

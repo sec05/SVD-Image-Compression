@@ -2,6 +2,8 @@ main
 images
 .DS_STORE
 .vscode
+obj
+bin
 # Prerequisites
 *.d
 

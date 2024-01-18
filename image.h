@@ -7,4 +7,4 @@ typedef struct
 } image;
 
 image* loadImageFromFile(char* filename);
-int outputImageToFile(image* img, char* filename);
+void outputImageToFile(image* img, char* filename);

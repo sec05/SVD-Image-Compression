@@ -42,14 +42,14 @@ image* loadImageFromFile(char* filename){
     return img;
 }
 
-int outputImageToFile(image* img, char* filename){
+void outputImageToFile(image* img, char* filename){
     //Outputs an image struct to a bmp file returns 1 if successful and 0 if not
     FILE* file = fopen(filename, "wb");
     if(file == NULL){
         printf("Error in opening output file");
-        return 0;
+        return;
     }
-    
+
     fwrite(img->header,sizeof(unsigned char),54,file);
     int size = img->height*img->width;
 
@@ -60,5 +60,4 @@ int outputImageToFile(image* img, char* filename){
         putc(img->data[i],file);
     }
     fclose(file);
-    return 1;
 }
