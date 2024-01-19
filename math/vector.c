@@ -84,6 +84,9 @@ double dotProduct(vector *v, vector *w)
 }
 
 vector *makeUnitVector(vector *v){
+    if(dotProduct(v, v) == 0){
+        return v;
+    }
     return scalarMultiplyVector(v, 1.0 / sqrt(dotProduct(v, v)));
 }
 

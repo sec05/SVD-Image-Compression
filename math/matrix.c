@@ -56,7 +56,7 @@ void printMatrix(matrix *A)
     {
         printf("| ");
         for (int j = 0; j < A->cols; j++)
-        {
+        {   
             printf("%f ", A->data[i][j]);
         }
         printf("|");
@@ -178,4 +178,18 @@ matrix* scalarMultiplyMatrix(matrix* A, double scalar){
         }
     }
     return B;
+}
+
+int matrixEquals(matrix* A, matrix* B){
+    if(A->rows != B->rows || A->cols != B->cols){
+        return 0;
+    }
+    for(int i = 0; i < A->rows; i++){
+        for(int j = 0; j < A->cols; j++){
+            if(A->data[i][j] != B->data[i][j]){
+                return 0;
+            }
+        }
+    }
+    return 1;
 }

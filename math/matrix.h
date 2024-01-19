@@ -22,4 +22,5 @@ matrix* matrixSubtract(matrix* A, matrix* B);
 matrix* scalarMultiplyMatrix(matrix* A, double scalar);
 vector *getRow(matrix *A, int row);
 vector *getColumn(matrix *A, int col);
+int matrixEquals(matrix *A, matrix *B);
 //void fillMatrixWithImageData(matrix* A, image* img);

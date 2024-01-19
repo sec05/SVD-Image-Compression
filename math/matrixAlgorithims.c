@@ -63,46 +63,43 @@ It takes in a matrix A and returns a matrix W and a matrix R such that WA = R.
 It returns a pointer to an array of matrices where the first matrix is W and the second matrix is R.
 */
 matrix** householder(matrix* A){
-    // This function takes in a matrix A and returns a matrix W and a matrix R such that WA = R
-    matrix** WR = malloc(sizeof(matrix*) * 2);
-    WR[0] = makeMatrix(A->rows, A->cols);
-    WR[1] = copyMatrix(A);
-    for(int k = 0; k < A->cols;k++){
-        // x = a_k:m,k
-        vector *x = makeVector(A->rows-k);
-        for(int i = k; i < A->rows; i++){
-            x->components[i-k] = A->data[i][k];
+    // This function takes in a matrix A and returns a matrix Q and a matrix R such that A = QR
+    // It returns a pointer to an array of matrices where the first matrix is Q and the second matrix is R
+    matrix** QR = malloc(sizeof(matrix*) * 2);
+    QR[0] = identityMatrix(A->rows, A->rows);
+    QR[1] = copyMatrix(A);
+    for(int k = 0; k < A->rows;k++){
+        vector* x = getColumn(QR[1], k);
+        vector* v = makeVector(x->dimension);
+        for(int i = 0; i < x->dimension; i++){
+            if(i < k){
+                v->components[i] = 0;
+            }
+            else{
+                v->components[i] = x->components[i];
+            }
         }
-        printf("x:\n");
-        printVector(x);
-        printf("A:\n");
-        printMatrix(A);
-        printf("\n");
-        //w_k = sign(x_1) * ||x|| * e_1 + x
-        vector *e = makeVector(A->rows-k);
-        e->components[0] = sqrt(dotProduct(x,x));
-        for(int i = 1; i < A->rows-k; i++){
+        double vNorm = sqrt(dotProduct(v, v));
+        
+        vector* e = makeVector(v->dimension);
+        for(int i = 0; i < e->dimension; i++){
             e->components[i] = 0;
         }
-        vector *w_k = vectorAdd(scalarMultiplyVector(e,x->components[0]/fabs(x->components[0])), x);
-        printf("w_k:\n");
-        printVector(w_k);
-        //w_k = w_k / ||w_k||
-        w_k = makeUnitVector(w_k);
-        //A_k:m,k:n = A_k:m,k:n - 2 * w_k * (w_k^T * A_k:m,k:n)
-        for(int i = k; i < A->rows; i++){
-            for(int j = k; j < A->cols; j++){
-                vector* A_k = makeVector(A->rows-k);
-                for(int l = k; l < A->rows; l++){
-                    A_k->components[l-k] = A->data[l][j];
-                }
-                //This should be outer product
-                WR[1]->data[i][j] -= 2 * w_k->components[i-k] * (dotProduct(w_k, A_k));
+        e->components[k] = 1;
+
+        v = vectorSubtract(v, scalarMultiplyVector(e, vNorm));
+        v = makeUnitVector(v);
+
+        matrix* H = identityMatrix(A->rows, A->rows);
+
+        for(int i = 0; i < v->dimension; i++){
+            for(int j = 0; j < v->dimension; j++){
+                H->data[i][j] = H->data[i][j] - 2 * v->components[i] * v->components[j];
             }
         }
-        for(int i = k; i < A->rows; i++){
-                WR[0]->data[i][k] = w_k->components[i-k];
-            }
+
+        QR[1] = matrixMultiply(H, QR[1]);
+        QR[0] = matrixMultiply(QR[0], transpose(H));
     }
-    return WR;
+    return QR;
 }
